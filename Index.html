@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nocco & Runk-klockan</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #111;
+      --font: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .emoji {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+
+    .time {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 1rem;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="emoji" id="emojiDisplay">⏰</div>
+  <div class="time" id="timeDisplay">--:--:--</div>
+  <footer>Nocco & Runk-klockan</footer>
+
+  <!-- Ljud -->
+  <audio id="ding" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+
+  <script>
+    const schedule = {
+      0: "🥤",
+      1: "🍆💦",
+      2: "🥤",
+      3: "🍆💦",
+      4: "🥤",
+      5: "🍆💦",
+      6: "🥤",
+      7: "🍆💦",
+      8: "🥤",
+      9: "🍆💦",
+      10: "🥤",
+      11: "🍆💦",
+      12: "🥤",
+      13: "🍆💦",
+      14: "🥤🍆💦",
+      15: "🥤",
+      16: "🍆💦",
+      17: "🥤",
+      18: "🍆💦",
+      19: "🥤",
+      20: "🍆💦",
+      21: "🥤🍆💦",
+      22: "🍆💦",
+      23: "🥤"
+    };
+
+    const timeDisplay = document.getElementById("timeDisplay");
+    const emojiDisplay = document.getElementById("emojiDisplay");
+    const sound = document.getElementById("ding");
+
+    let lastHour = -1;
+
+    // Begär notifikations-tillstånd
+    if ('Notification' in window) {
+      Notification.requestPermission();
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+      const second = now.getSeconds();
+
+      const timeStr = now.toLocaleTimeString("sv-SE", { hour12: false });
+      timeDisplay.textContent = timeStr;
+
+      emojiDisplay.textContent = schedule[hour] || "⏰";
+
+      // Vid ny timme: spela ljud och skicka notis
+      if (minute === 0 && second === 0 && hour !== lastHour) {
+        lastHour = hour;
+        if (Notification.permission === "granted") {
+          new Notification("Nocco & Runk!", {
+            body: `Dags för ${schedule[hour] || "⏰"}`
+          });
+        }
+        sound.play();
+      }
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
